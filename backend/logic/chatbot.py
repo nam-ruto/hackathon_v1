@@ -37,7 +37,7 @@ def get_session_history(session_id: str):
     return session_store[session_id]
 
 
-# Call this function only one time
+# Call this function only one time: handle the chatbot
 def initialize_rag_chain(retriever):
 
     llm = ChatOpenAI(api_key=API_KEY, model='gpt-4o-mini')
@@ -99,6 +99,28 @@ def initialize_rag_chain(retriever):
     logging.debug("4. Created RAG chain")
 
 
+# Handle the GPA request
+def initialize_rag_chain_for_gpa(retriever):
+    llm = ChatOpenAI(api_key=API_KEY, model='gpt-4o-mini')
+
+    system_prompt = (
+    "You are an assistant for question-answering tasks. "
+    "Use the following context and you knowledge to answer "
+    "the question."
+    "\n\n"
+    "{context}"
+    )
+
+    prompt = ChatPromptTemplate.from_messages(
+    [
+        ("system", system_prompt),
+        ("human", "{input}"),
+    ]
+    )
+
+    question_answer_chain = create_stuff_documents_chain(llm, prompt)
+    session_store['conversational_rag_chain_gpa'] = create_retrieval_chain(retriever, question_answer_chain)
+
 # Main chatbot process
 def process_chat(user_input: str, session_id: str):
     # Load embedding only one time
@@ -117,3 +139,18 @@ def process_chat(user_input: str, session_id: str):
     answer = response['answer']
 
     return answer
+
+# GPA Advisor
+def gpa_advise(user_input: str):
+    # Load embedding only one time
+    if "retriever" not in session_store:
+        session_store["retriever"] = load_embedding()
+
+    # Ensure RAG chain is initialized
+    if 'conversational_rag_chain_gpa' not in session_store:
+        initialize_rag_chain_for_gpa(retriever=session_store["retriever"])
+    
+    rag_chain = session_store['conversational_rag_chain_gpa']
+    response = rag_chain.invoke({"input": user_input})
+    print(response["answer"])
+    return response["answer"]
