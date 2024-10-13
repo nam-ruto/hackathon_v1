@@ -1,0 +1,21 @@
+{
+    "questions": [
+      {
+        "question": "I need to pay the tuition fees, where should I do that?",
+        "answer": "You can pay your fees at Adam's Building."
+      },
+      {
+        "question": "Where is the library located?",
+        "answer": "The library is located at the Central Campus, next to the Science building."
+      },
+      {
+        "question": "What are the campus tour timings?",
+        "answer": "Campus tours are available from 9 AM to 4 PM, Monday to Friday."
+      },
+      {
+        "question": "How do I book a campus tour?",
+        "answer": "You can book a campus tour through the university's official website."
+      }
+    ]
+  }
+  
